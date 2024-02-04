@@ -158,7 +158,8 @@ impl xwt_core::traits::AcceptBiStream for Connection {
         let reader: wasm_bindgen::JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
-        let value: web_sys::WebTransportBidirectionalStream = read_result.into();
+        let value: web_sys::WebTransportBidirectionalStream =
+            js_sys::Reflect::get(&read_result, &wasm_bindgen::JsValue::from_str("value"))?.into();
         let value = wrap_bi_stream(&self.transport, value);
         Ok(value)
     }
