@@ -39,7 +39,7 @@ where
 
     tokio::pin!(send_stream);
 
-    let mut to_write = &b"hello"[..];
+    let mut to_write = &b"hello!"[..];
     loop {
         let written = tokio::io::AsyncWriteExt::write(&mut send_stream, to_write)
             .await
@@ -66,16 +66,18 @@ where
         return Err(Error::BadData(read_buf));
     }
 
-    let read = tokio::io::AsyncReadExt::read(&mut recv_stream, &mut read_buf[..])
+    let mut read_buf_2 = vec![0u8; 3];
+
+    let read = tokio::io::AsyncReadExt::read(&mut recv_stream, &mut read_buf_2[..])
         .await
         .map_err(Error::Read)?;
     if read == 0 {
         return Err(Error::NoResponse);
     };
-    read_buf.truncate(read);
+    read_buf_2.truncate(read);
 
-    if read_buf != b"ll" {
-        return Err(Error::BadData(read_buf));
+    if read_buf_2 != b"llo" {
+        return Err(Error::BadData(read_buf_2));
     }
 
     let read = tokio::io::AsyncReadExt::read(&mut recv_stream, &mut read_buf[..])
@@ -86,7 +88,7 @@ where
     };
     read_buf.truncate(read);
 
-    if read_buf != b"o" {
+    if read_buf != b"!" {
         return Err(Error::BadData(read_buf));
     }
 
